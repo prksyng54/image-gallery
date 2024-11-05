@@ -68,6 +68,99 @@
         <span class="control" id="pause" style="display: none;"><i class="bi bi-pause"></i></span>
         <img src="#" alt="Enlarged Image">
     </div>
+
+    <script>
+        const galleries = document.querySelectorAll('.gallery');
+        const overlay = document.querySelector('.overlay');
+        const overlayImage = overlay.querySelector('img');
+        const closeButton = overlay.querySelector('#close');
+        const nextButton = overlay.querySelector('#next');
+        const previousButton = overlay.querySelector('#previous');
+        const playButton = overlay.querySelector('#play');
+        const pauseButton = overlay.querySelector('#pause');
+
+        let currentImages = [];
+        let currentIndex = 0;
+        let playInterval = null;
+
+        function showImage(index) {
+            currentIndex = index;
+            overlay.classList.add('active');
+            overlayImage.src = currentImages[currentIndex].src;
+        }
+
+        function close() {
+            overlay.classList.remove('active', 'playing');
+            clearInterval(playInterval);
+            playInterval = null;
+        }
+
+        function next() {
+            currentIndex = (currentIndex + 1) % currentImages.length;
+            showImage(currentIndex);
+        }
+
+        function previous() {
+            currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+            showImage(currentIndex);
+        }
+        function play() {
+            overlay.classList.add('playing');
+            playInterval = setInterval(next, 1000);
+            playButton.style.display = 'none';  
+            pauseButton.style.display = 'block'; 
+        }
+
+        function pause() {
+            overlay.classList.remove('playing');
+            clearInterval(playInterval);
+            playInterval = null;
+            playButton.style.display = 'block';  
+            pauseButton.style.display = 'none';  
+        }
+
+
+        function toggleSlideshow() {
+            if (playInterval) {
+                pause();
+            } else {
+                play();
+            }
+        }
+
+        galleries.forEach(gallery => {
+            gallery.addEventListener('click', event => {
+                if (event.target.tagName === 'IMG') {
+                    currentImages = Array.from(gallery.querySelectorAll('img'));
+                    showImage(currentImages.indexOf(event.target));
+                }
+            });
+        });
+
+        closeButton.addEventListener('click', close);
+        nextButton.addEventListener('click', next);
+        previousButton.addEventListener('click', previous);
+        playButton.addEventListener('click', play);
+        pauseButton.addEventListener('click', pause);
+
+        window.addEventListener("keydown", (event) => {
+            switch (event.key) {
+                case "Escape":
+                    close();
+                    break;
+                case "ArrowLeft":
+                    previous();
+                    break;
+                case "ArrowRight":
+                    next();
+                    break;
+                case " ":
+                    event.preventDefault();
+                    toggleSlideshow();
+                    break;
+            }
+        });
+    </script>
 </body>
 
 </html>
